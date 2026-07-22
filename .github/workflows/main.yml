@@ -1,0 +1,36 @@
+name: Deploy pe GitHub Pages
+
+# Se declanșează automat la fiecare push pe branch-ul main
+on:
+  push:
+    branches: [main]
+  # Permite și pornirea manuală din tab-ul Actions (butonul "Run workflow")
+  workflow_dispatch:
+
+# Permisiunile de care are nevoie job-ul ca să publice pe Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # 1. Ia codul din repository
+      - name: Ia codul din repo
+        uses: actions/checkout@v4
+
+      # 2. Împachetează fișierele site-ului (tot folderul)
+      - name: Împachetează site-ul
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      # 3. Publică live pe GitHub Pages
+      - name: Publică pe Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
